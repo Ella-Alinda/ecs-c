@@ -1,3 +1,6 @@
+#ifndef CPUBENCH_HPP
+#define CPUBENCH_HPP
+
 #include <cmath>
 #include <vector>
 #include <thread>
@@ -43,3 +46,5 @@ double performSingleCoreBenchmark()
 
     return result;
 }
+
+#endif
