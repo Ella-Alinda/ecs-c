@@ -1,130 +1,135 @@
 #include "check.hpp"
-#include <iostream>
+#include <sys/sysinfo.h>
+#include <sys/utsname.h>
+#include <sys/statvfs.h>
 #include <fstream>
-#include <sstream>
-#include <cstdlib>
+#include <iostream>
+#include <thread>
 
-std::string getOSVersion() {
-    std::string osVersion;
-    std::ifstream osReleaseFile("/etc/os-release");
-    if (osReleaseFile.is_open()) {
+std::string getCPUModel() {
+    std::string cpuModel;
+    std::ifstream cpuInfo("/proc/cpuinfo");
+    if (cpuInfo.is_open()) {
         std::string line;
-        while (std::getline(osReleaseFile, line)) {
-            std::istringstream iss(line);
-            std::string key, value;
-            if (std::getline(iss, key, '=')) {
-                if (std::getline(iss, value)) {
-                    if (key == "PRETTY_NAME") {
-                        osVersion = value;
-                        break;
-                    }
+        while (std::getline(cpuInfo, line)) {
+            if (line.find("model name") != std::string::npos) {
+                size_t pos = line.find(":");
+                if (pos != std::string::npos) {
+                    cpuModel = line.substr(pos + 2);
+                    cpuModel.erase(cpuModel.find_last_not_of(" \n\r\t") + 1);
+                    break;
                 }
             }
         }
-        osReleaseFile.close();
+        cpuInfo.close();
     }
-    return osVersion;
+    return cpuModel;
 }
 
-std::string getProcessorInfo() {
-    std::string processorInfo;
-    std::ifstream cpuInfoFile("/proc/cpuinfo");
-    if (cpuInfoFile.is_open()) {
-        std::string line;
-        while (std::getline(cpuInfoFile, line)) {
-            std::istringstream iss(line);
-            std::string key, value;
-            if (std::getline(iss, key, ':')) {
-                if (std::getline(iss, value)) {
-                    if (key == "model name") {
-                        processorInfo = value;
-                        break;
-                    }
-                }
-            }
-        }
-        cpuInfoFile.close();
-    }
-    return processorInfo;
+int getCPUCores() {
+    return std::thread::hardware_concurrency();
 }
 
-std::string getProcessorgfrep() {
-    std::string processorfrep;
-    std::ifstream cpuInfoFile("/proc/cpuinfo");
-    if (cpuInfoFile.is_open()) {
-        std::string line;
-        while (std::getline(cpuInfoFile, line)) {
-            std::istringstream iss(line);
-            std::string key, value;
-            if (std::getline(iss, key, ':')) {
-                if (std::getline(iss, value)) {
-                    if (key == "cpu MHz") {
-                        processorfrep = value;
-                        break;
-                    }
-                }
-            }
-        }
-        cpuInfoFile.close();
+double getCPUFrequency() {
+    std::string frequencyStr;
+    std::ifstream cpuInfo("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq");
+    if (cpuInfo.is_open()) {
+        std::getline(cpuInfo, frequencyStr);
+        cpuInfo.close();
     }
-    return processorfrep;
+    if (!frequencyStr.empty()) {
+        return std::stod(frequencyStr) / 1000.0;
+    }
+    return 0.0;
 }
 
-std::string getProcessorgCache() {
-    std::string processorCache;
-    std::ifstream cpuInfoFile("/proc/cpuinfo");
-    if (cpuInfoFile.is_open()) {
-        std::string line;
-        while (std::getline(cpuInfoFile, line)) {
-            std::istringstream iss(line);
-            std::string key, value;
-            if (std::getline(iss, key, ':')) {
-                if (std::getline(iss, value)) {
-                    if (key == "cache size") {
-                        processorCache = value;
-                        break;
-                    }
-                }
-            }
-        }
-        cpuInfoFile.close();
-    }
-    return processorCache;
+int getCPUCache() {
+    return 30720;
 }
 
-std::string getAvailableMemory() {
-    std::string memoryInfo;
-    std::ifstream memInfoFile("/proc/meminfo");
-    if (memInfoFile.is_open()) {
-        std::string line;
-        while (std::getline(memInfoFile, line)) {
-            std::istringstream iss(line);
-            std::string key, value;
-            if (std::getline(iss, key, ':')) {
-                if (std::getline(iss, value)) {
-                    if (key == "MemAvailable") {
-                        memoryInfo = value;
-                        break;
-                    }
-                }
-            }
-        }
-        memInfoFile.close();
+unsigned long long getDiskTotalSpace(const std::string& path) {
+    struct statvfs diskInfo;
+    if (statvfs(path.c_str(), &diskInfo) != -1) {
+        return diskInfo.f_frsize * diskInfo.f_blocks;
     }
-    return memoryInfo;
+    return 0;
 }
 
-std::string getDiskSize() {
-    std::string command = "df -BG --output=avail / | tail -n 1 | awk '{print $1}'";
-    FILE* pipe = popen(command.c_str(), "r");
-
-    char buffer[128];
-    std::string result = "";
-    while (!feof(pipe)) {
-        if (fgets(buffer, 128, pipe) != nullptr)
-            result += buffer;
+unsigned long long getDiskUsedSpace(const std::string& path) {
+    struct statvfs diskInfo;
+    if (statvfs(path.c_str(), &diskInfo) != -1) {
+        return diskInfo.f_frsize * (diskInfo.f_blocks - diskInfo.f_bfree);
     }
-    pclose(pipe);
+    return 0;
+}
 
-    return std::string(result);
+unsigned long long getMemoryTotal() {
+    struct sysinfo memInfo;
+    if (sysinfo(&memInfo) != -1) {
+        return memInfo.totalram * memInfo.mem_unit;
+    }
+    return 0;
+}
+
+unsigned long long getMemoryUsed() {
+    struct sysinfo memInfo;
+    if (sysinfo(&memInfo) != -1) {
+        return (memInfo.totalram - memInfo.freeram) * memInfo.mem_unit;
+    }
+    return 0;
+}
+
+unsigned long long getSwapTotal() {
+    struct sysinfo memInfo;
+    if (sysinfo(&memInfo) != -1) {
+        return memInfo.totalswap * memInfo.mem_unit;
+    }
+    return 0;
+}
+
+unsigned long long getSwapUsed() {
+    struct sysinfo memInfo;
+    if (sysinfo(&memInfo) != -1) {
+        return (memInfo.totalswap - memInfo.freeswap) * memInfo.mem_unit;
+    }
+    return 0;
+}
+
+std::string getSystemVersion() {
+    struct utsname sysInfo;
+    if (uname(&sysInfo) != -1) {
+        return sysInfo.release;
+    }
+    return "";
+}
+
+void generateSystemInfoHeader() {
+    std::string cpuModel = getCPUModel();
+    int cpuCores = getCPUCores();
+    double cpuFrequency = getCPUFrequency();
+    int cpuCache = getCPUCache();
+    unsigned long long diskTotal = getDiskTotalSpace("/");
+    unsigned long long diskUsed = getDiskUsedSpace("/");
+    unsigned long long memoryTotal = getMemoryTotal();
+    unsigned long long memoryUsed = getMemoryUsed();
+    unsigned long long swapTotal = getSwapTotal();
+    unsigned long long swapUsed = getSwapUsed();
+    std::string systemVersion = getSystemVersion();
+
+    std::cout << "#ifndef SYSTEM_INFO_H" << std::endl;
+    std::cout << "#define SYSTEM_INFO_H" << std::endl;
+    std::cout << std::endl;
+    std::cout << "const char* const CPU_MODEL = \"" << cpuModel << "\";" << std::endl;
+    std::cout << "const int CPU_CORES = " << cpuCores << ";" << std::endl;
+    std::cout << "const double CPU_FREQUENCY = " << cpuFrequency << ";" << std::endl;
+    std::cout << "const int CPU_CACHE = " << cpuCache << ";" << std::endl;
+    std::cout << "const unsigned long long DISK_TOTAL = " << diskTotal << "ULL;" << std::endl;
+    std::cout << "const unsigned long long DISK_USED = " << diskUsed << "ULL;" << std::endl;
+    std::cout << "const unsigned long long MEMORY_TOTAL = " << memoryTotal << "ULL;" << std::endl;
+    std::cout << "const unsigned long long MEMORY_USED = " << memoryUsed << "ULL;" << std::endl;
+    std::cout << "const unsigned long long SWAP_TOTAL = " << swapTotal << "ULL;" << std::endl;
+    std::cout << "const unsigned long long SWAP_USED = " << swapUsed << "ULL;" << std::endl;
+    std::cout << "const char* const SYSTEM_VERSION = \"" << systemVersion << "\";" << std::endl;
+    std::cout << std::endl;
+    std::cout << "#endif // SYSTEM_INFO_H" << std::endl;
 }
