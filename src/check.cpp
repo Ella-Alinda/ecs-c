@@ -5,6 +5,26 @@
 #include <fstream>
 #include <iostream>
 #include <thread>
+#include <cmath>
+#include <string>
+
+std::string formatSize(unsigned long long sizeInBytes) {
+    const unsigned int base = 1024;
+    const char* units[] = {"B", "KB", "MB", "GB"};
+
+    int unitIndex = 0;
+    double size = static_cast<double>(sizeInBytes);
+
+    while (size >= base && unitIndex < 3) {
+        size /= base;
+        unitIndex++;
+    }
+
+    char formattedSize[16];
+    std::snprintf(formattedSize, sizeof(formattedSize), "%.2f %s", size, units[unitIndex]);
+    return std::string(formattedSize);
+}
+
 
 std::string getCPUModel() {
     std::string cpuModel;
@@ -114,10 +134,16 @@ void generateSystemInfoHeader() {
     unsigned long long memoryUsed = getMemoryUsed();
     unsigned long long swapTotal = getSwapTotal();
     unsigned long long swapUsed = getSwapUsed();
+    std::string formattedDiskTotal = formatSize(diskTotal);
+    std::string formattedDiskUsed = formatSize(diskUsed);
+    std::string formattedMemoryTotal = formatSize(memoryTotal);
+    std::string formattedMemoryUsed = formatSize(memoryUsed);
+    std::string formattedSwapTotal = formatSize(swapTotal);
+    std::string formattedSwapUsed = formatSize(swapUsed);
     std::string systemVersion = getSystemVersion();
 
-    std::cout << "#ifndef SYSTEM_INFO_H" << std::endl;
-    std::cout << "#define SYSTEM_INFO_H" << std::endl;
+    std::cout << "#ifndef CHECK_HPP" << std::endl;
+    std::cout << "#define CHECK_HPP" << std::endl;
     std::cout << std::endl;
     std::cout << "const char* const CPU_MODEL = \"" << cpuModel << "\";" << std::endl;
     std::cout << "const int CPU_CORES = " << cpuCores << ";" << std::endl;
@@ -129,7 +155,14 @@ void generateSystemInfoHeader() {
     std::cout << "const unsigned long long MEMORY_USED = " << memoryUsed << "ULL;" << std::endl;
     std::cout << "const unsigned long long SWAP_TOTAL = " << swapTotal << "ULL;" << std::endl;
     std::cout << "const unsigned long long SWAP_USED = " << swapUsed << "ULL;" << std::endl;
+    std::cout << "const std::string DISK_TOTAL = \"" << formattedDiskTotal << "\";" << std::endl;
+    std::cout << "const std::string DISK_USED = \"" << formattedDiskUsed << "\";" << std::endl;
+    std::cout << "const std::string MEMORY_TOTAL = \"" << formattedMemoryTotal << "\";" << std::endl;
+    std::cout << "const std::string MEMORY_USED = \"" << formattedMemoryUsed << "\";" << std::endl;
+    std::cout << "const std::string SWAP_TOTAL = \"" << formattedSwapTotal << "\";" << std::endl;
+    std::cout << "const std::string SWAP_USED = \"" << formattedSwapUsed << "\";" << std::endl;
+    
     std::cout << "const char* const SYSTEM_VERSION = \"" << systemVersion << "\";" << std::endl;
     std::cout << std::endl;
-    std::cout << "#endif // SYSTEM_INFO_H" << std::endl;
+    std::cout << "#endif" << std::endl;
 }

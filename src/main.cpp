@@ -5,15 +5,18 @@
 using namespace std;
 int main()
 {
-    std::cout << "-------------------系统信息--------------------" << std::endl; 
-    std::cout << "CPU 型号          :" << getCPUModel << std::endl;
-    std::cout << "CPU 核心数        :" << getCPUCores << std::endl;
-    std::cout << "CPU 频率          :" << getCPUFrequency << std::endl;
-    std::cout << "CPU 缓存          :" << getCPUCache << std::endl;
-    std::cout << "硬盘空间          :" << getDiskTotalSpace << "(" << getDiskUsedSpace << "可用空间）" << std::endl;
-    std::cout << "内存              :" << getMemoryTotal << "(" << getMemoryUsed << "可用内存）" << std::endl;
-    std::cout << "SWAP              :" << getSwapTotal << "(" << getSwapUsed << "可用SWAP）" << std::endl;
-    std::cout << "系统              :" << getSystemVersion << " " << generateSystemInfoHeader << std::endl;
+std::cout << "-------------------系统信息--------------------" << std::endl;
+std::cout << "CPU 型号          : " << getCPUModel() << std::endl;
+std::cout << "CPU 核心数        : " << getCPUCores() << std::endl;
+std::cout << "CPU 频率          : " << getCPUFrequency() << std::endl;
+std::cout << "CPU 缓存          : " << getCPUCache() << std::endl;
+std::cout << "硬盘空间          : " << formatSize(getDiskTotalSpace("/")) << " ("
+          << formatSize(getDiskUsedSpace("/")) << " 可用空间)" << std::endl;
+std::cout << "内存              : " << formatSize(getMemoryTotal()) << " ("
+          << formatSize(getMemoryUsed()) << " 可用内存)" << std::endl;
+std::cout << "SWAP              : " << formatSize(getSwapTotal()) << " ("
+          << formatSize(getSwapUsed()) << " 可用SWAP)" << std::endl;
+std::cout << "系统              : " << getSystemVersion() << std::endl;
 
     std::cout << "-------------------性能测试--------------------" << std::endl; 
     double multiCoreResult = performMultiCoreBenchmark();
