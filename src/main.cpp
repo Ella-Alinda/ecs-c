@@ -27,8 +27,8 @@ std::cout << "系统              : " << getSystemVersion() << std::endl;
     int dataSize = 1000000; // 数据大小（以整数为单位）
 
     // 分配内存并初始化数据
-    int* data = new int[dataSize];
-    std::memset(data, 0, dataSize * sizeof(int));
+    uint64_t* data = new uint64_t[dataSize];
+    std::memset(data, 0, dataSize * sizeof(uint64_t));
 
     // 测试内存读性能并返回结果
     double readResult = testMemoryReadPerformance(data, dataSize);

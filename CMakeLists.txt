@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.12)
 project(ECS)
 
+set(CMAKE_CXX_FLAGS_RELWITHDEBUGINFO "-O3 -g")
+
 # 设置 C++ 标准
 set(CMAKE_CXX_STANDARD 11)
 
