@@ -2,6 +2,7 @@
 #include "check.hpp"
 #include "cpubench.hpp"
 #include "membench.hpp"
+extern "C"
 using namespace std;
 int main()
 {
