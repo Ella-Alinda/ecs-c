@@ -6,7 +6,7 @@
 #include <iomanip>
 
 // 测试内存读性能并返回结果
-double testMemoryReadPerformance(uint64_t* data, int size) {
+double testMemoryReadPerformance(__uint128_t* data, int size) {
     auto startTime = std::chrono::high_resolution_clock::now();
     volatile long long sum = 0;
     for (int i = 0; i < size; i += 2) {
@@ -15,12 +15,12 @@ double testMemoryReadPerformance(uint64_t* data, int size) {
     }
     auto endTime = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(endTime - startTime);
-    double transferRateMB = (static_cast<double>(size * sizeof(uint64_t)) / 1048576) / (duration.count() / 1e9);
+    double transferRateMB = (static_cast<double>(size * sizeof(__uint128_t)) / 1048576) / (duration.count() / 1e9);
     return transferRateMB;
 }
 
 // 测试内存写性能并返回结果
-double testMemoryWritePerformance(uint64_t* data, int size) {
+double testMemoryWritePerformance(__uint128_t* data, int size) {
     auto startTime = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < size; i += 2) {
         data[i] = i;
@@ -28,7 +28,7 @@ double testMemoryWritePerformance(uint64_t* data, int size) {
     }
     auto endTime = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(endTime - startTime);
-    double transferRateMB = (static_cast<double>(size * sizeof(uint64_t)) / 1048576) / (duration.count() / 1e9);
+    double transferRateMB = (static_cast<double>(size * sizeof(__uint128_t)) / 1048576) / (duration.count() / 1e9);
     return transferRateMB;
 }
 
