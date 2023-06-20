@@ -8,7 +8,7 @@
 // 测试内存读性能并返回结果
 double testMemoryReadPerformance(uint64_t* data, int size) {
     auto startTime = std::chrono::high_resolution_clock::now();
-    long long sum = 0;
+    volatile long long sum = 0;
     for (int i = 0; i < size; i += 2) {
         sum += data[i];
         sum += data[i + 1];
