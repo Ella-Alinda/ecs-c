@@ -3,6 +3,7 @@
 
 #include <string>
 #include <cmath>
+extern "C"
 
 std::string getCPUModel();
 int getCPUCores();

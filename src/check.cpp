@@ -7,7 +7,6 @@
 #include <thread>
 #include <cmath>
 #include <string>
-extern "C"
 
 std::string formatSize(unsigned long long sizeInBytes) {
     const unsigned int base = 1024;

@@ -13,6 +13,7 @@ include_directories(include)
 set(SOURCES
     src/check.cpp
     src/main.cpp
+    src/sb_memory.c
 )
 
 # 生成可执行文件

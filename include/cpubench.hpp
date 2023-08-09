@@ -4,6 +4,7 @@
 #include <cmath>
 #include <vector>
 #include <thread>
+extern "C"
 
 // 多核性能测试函数
 double performMultiCoreBenchmark()

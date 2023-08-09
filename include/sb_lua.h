@@ -1,5 +1,5 @@
-/* Copyright (C) 2004 MySQL AB
-   Copyright (C) 2004-2008 Alexey Kopytov <akopytov@gmail.com>
+/* Copyright (C) 2006 MySQL AB
+   Copyright (C) 2006-2018 Alexey Kopytov <akopytov@gmail.com>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,27 +15,28 @@
    along with this program; if not, write to the Free Software
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 */
-#include "sysbench.h"
-#ifndef SB_MEMORY_H
-#define SB_MEMORY_H
 
-/* Memory request type definition */
-typedef enum
-{
-  SB_MEM_OP_NONE,
-  SB_MEM_OP_READ,
-  SB_MEM_OP_WRITE
-} sb_mem_op_t;
-
-
-/* Memory scope type definition */
-typedef enum
-{
-  SB_MEM_SCOPE_GLOBAL,
-  SB_MEM_SCOPE_LOCAL
-} sb_mem_scope_t;
-
-
-int register_test_memory(sb_list_t *tests);
-
+#ifdef HAVE_CONFIG_H
+# include "config.h"
 #endif
+
+#include "sysbench.h"
+#include "lua.h"
+
+/* Load a specified Lua script */
+
+sb_test_t *sb_load_lua(const char *testname);
+
+void sb_lua_done(void);
+
+int sb_lua_hook_call(lua_State *L, const char *name);
+
+bool sb_lua_custom_command_defined(const char *name);
+
+int sb_lua_call_custom_command(const char *name);
+
+int sb_lua_report_thread_init(void);
+
+void sb_lua_report_thread_done(void *);
+
+bool sb_lua_loaded(void);
