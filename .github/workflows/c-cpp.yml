@@ -23,3 +23,6 @@ jobs:
       with:
         name: ECS-x86
         path: build/ECS
+    
+    - name: Clean
+      run: rm -rf build

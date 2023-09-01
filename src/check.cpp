@@ -63,8 +63,43 @@ double getCPUFrequency() {
     return 0.0;
 }
 
-int getCPUCache() {
-    return 30720;
+int getCPUCacheL1() {
+    std::string cacheStr;
+    std::ifstream cpuInfo("/sys/devices/system/cpu/cpu0/cache/index1/size");
+    if (cpuInfo.is_open()) {
+        std::getline(cpuInfo, cacheStr);
+        cpuInfo.close();
+    }
+    if (!cacheStr.empty()) {
+        return std::stod(cacheStr);
+    }
+    return 0.0;
+}
+
+int getCPUCacheL2() {
+    std::string cacheStr;
+    std::ifstream cpuInfo("/sys/devices/system/cpu/cpu0/cache/index2/size");
+    if (cpuInfo.is_open()) {
+        std::getline(cpuInfo, cacheStr);
+        cpuInfo.close();
+    }
+    if (!cacheStr.empty()) {
+        return std::stod(cacheStr);
+    }
+    return 0.0;
+}
+
+int getCPUCacheL3() {
+    std::string cacheStr;
+    std::ifstream cpuInfo("/sys/devices/system/cpu/cpu0/cache/index3/size");
+    if (cpuInfo.is_open()) {
+        std::getline(cpuInfo, cacheStr);
+        cpuInfo.close();
+    }
+    if (!cacheStr.empty()) {
+        return std::stod(cacheStr);
+    }
+    return 0.0;
 }
 
 unsigned long long getDiskTotalSpace(const std::string& path) {
@@ -127,7 +162,9 @@ void generateSystemInfoHeader() {
     std::string cpuModel = getCPUModel();
     int cpuCores = getCPUCores();
     double cpuFrequency = getCPUFrequency();
-    int cpuCache = getCPUCache();
+    int cpuCacheL1 = getCPUCacheL1();
+    int cpuCacheL2 = getCPUCacheL2();
+    int cpuCacheL3 = getCPUCacheL3();
     unsigned long long diskTotal = getDiskTotalSpace("/");
     unsigned long long diskUsed = getDiskUsedSpace("/");
     unsigned long long memoryTotal = getMemoryTotal();
@@ -148,7 +185,9 @@ void generateSystemInfoHeader() {
     std::cout << "const char* const CPU_MODEL = \"" << cpuModel << "\";" << std::endl;
     std::cout << "const int CPU_CORES = " << cpuCores << ";" << std::endl;
     std::cout << "const double CPU_FREQUENCY = " << cpuFrequency << ";" << std::endl;
-    std::cout << "const int CPU_CACHE = " << cpuCache << ";" << std::endl;
+    std::cout << "const int CPU_CACHEL1 = " << cpuCacheL1 << ";" << std::endl;
+    std::cout << "const int CPU_CACHEL2 = " << cpuCacheL2 << ";" << std::endl;
+    std::cout << "const int CPU_CACHEL3 = " << cpuCacheL3 << ";" << std::endl;
     std::cout << "const unsigned long long DISK_TOTAL = " << diskTotal << "ULL;" << std::endl;
     std::cout << "const unsigned long long DISK_USED = " << diskUsed << "ULL;" << std::endl;
     std::cout << "const unsigned long long MEMORY_TOTAL = " << memoryTotal << "ULL;" << std::endl;

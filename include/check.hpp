@@ -8,7 +8,9 @@ extern "C"
 std::string getCPUModel();
 int getCPUCores();
 double getCPUFrequency();
-int getCPUCache();
+int getCPUCacheL1();
+int getCPUCacheL2();
+int getCPUCacheL3();
 unsigned long long getDiskTotalSpace(const std::string& path);
 unsigned long long getDiskUsedSpace(const std::string& path);
 unsigned long long getMemoryTotal();
