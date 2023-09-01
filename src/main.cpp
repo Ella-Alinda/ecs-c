@@ -1,7 +1,7 @@
 #include <iostream>
 #include "check.hpp"
-// #include "sysbench/src/sysbench.h"
 #include "membench.hpp"
+
 extern "C"
 using namespace std;
 int main()
@@ -19,21 +19,6 @@ std::cout << "SWAP              : " << formatSize(getSwapTotal()) << " ("
           << formatSize(getSwapUsed()) << " 可用SWAP)" << std::endl;
 std::cout << "系统              : " << getSystemVersion() << std::endl;
 
-
-sysbench_init(NULL);
-sysbench_opt_set_num_threads(8); //线程数
-sysbench_opt_set_max_requests(1000000); //请求数
-sysbench_opt_set_memory_block_size(1<<20); //内存块大小
-int rc;
-rc = sysbench_run_test("memory", "sequential", NULL, NULL); //顺序读写内存
-
-rc = sysbench_run_test("cpu", "prime", NULL, NULL); //CPU测试
-printf("Memory test result: \n");
-sysbench_print_results("memory");
-
-printf("CPU test result: \n");  
-sysbench_print_results("cpu");
-sysbench_cleanup();
     // std::cout << "-------------------性能测试--------------------" << std::endl; 
     // double multiCoreResult = performMultiCoreBenchmark();
     // std::cout << "CPU多核成绩       :" << multiCoreResult << std::endl;
@@ -61,10 +46,11 @@ sysbench_cleanup();
     /*
     等待重写
     */
-    std::cout << "------------------内存测试--------------------" << std::endl;
-    std::cout << "内存测试 Test (Fast Mode, 1-Pass @ 5sec)" << std::endl;
-    std::cout << "单线程读测试:\t\t" << SB_MEM_OP_READ << " MB/s" << std::endl;
-    std::cout << "单线程写测试:\t\t" << SB_MEM_OP_WRITE << " MB/s" << std::endl;
+
+    // std::cout << "------------------内存测试--------------------" << std::endl;
+    // std::cout << "内存测试 Test (Fast Mode, 1-Pass @ 5sec)" << std::endl;
+    // std::cout << "单线程读测试:\t\t" << memory::get_read_throughput() << " MB/s" << std::endl;
+    // std::cout << "单线程写测试:\t\t" << memory::get_num_writes() << " MB/s" << std::endl;
 
    
 

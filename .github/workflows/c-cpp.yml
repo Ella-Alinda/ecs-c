@@ -9,12 +9,17 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
     - uses: actions/checkout@v3
     - name: cmake
       run: mkdir build && cmake ..
     - name: make
-      run: make
-
+      run: cd build && make
+    
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v3.1.2
+      with:
+        name: ECS-x86
+        path: build/ecs
